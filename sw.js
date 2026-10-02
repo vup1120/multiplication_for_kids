@@ -1,10 +1,12 @@
-// Offline support: precache the game shell, then serve from cache and refresh in the background.
+// Fetch the game shell from the network first, with an offline cache fallback.
  // Bump VERSION whenever the precache list changes.
-const VERSION = 'pig-home-v5';
+const VERSION = 'pig-home-v10-stats-zhuyin';
 const PRECACHE = [
  './',
  './index.html',
  './story-support.js',
+ './audio-support.js',
+ './review-support.js',
  './stats.js',
  './manifest.json',
  './assets/finale-palace.svg',
@@ -27,14 +29,15 @@ self.addEventListener('fetch', event => {
  if (request.method !== 'GET' || request.headers.has('range')) return;
  const url = new URL(request.url);
  if (url.origin !== self.location.origin) return;
+ const shell=request.mode==='navigate'||['index.html','audio-support.js','story-support.js','review-support.js','stats.js'].includes(url.pathname.split('/').pop());
  event.respondWith(caches.open(VERSION).then(async cache => {
-  const key = request.mode === 'navigate' ? './index.html' : request;
-  const cached = await cache.match(key, {ignoreSearch: request.mode === 'navigate'});
-  const network = fetch(request).then(response => {
-   if (response.ok && response.status === 200) cache.put(key, response.clone());
+  const key=request.mode==='navigate'?'./index.html':request;
+  const cached=await cache.match(key,{ignoreSearch:request.mode==='navigate'});
+  const network=fetch(shell?new Request(request,{cache:'no-cache'}):request).then(response=>{
+   if(response.ok&&response.status===200)event.waitUntil(cache.put(key,response.clone()));
    return response;
-  }).catch(() => cached || Response.error());
-  if (cached) { event.waitUntil(network.catch(() => {})); return cached; }
+  }).catch(()=>cached||Response.error());
+  if(!shell&&cached){event.waitUntil(network.catch(()=>{}));return cached;}
   return network;
  }));
 });
