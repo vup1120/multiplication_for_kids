@@ -19,8 +19,16 @@ const STORY_ZHUYIN = {
  砰:'ㄆㄥ',時:'ㄕˊ',間:'ㄐㄧㄢ',到:'ㄉㄠˋ',生:'ㄕㄥ',氣:'ㄑㄧˋ',
  耶:'ㄧㄝ',全:'ㄑㄩㄢˊ',部:'ㄅㄨˋ',家:'ㄐㄧㄚ',謝:'ㄒㄧㄝˋ',帶:'ㄉㄞˋ',我:'ㄨㄛˇ',回:'ㄏㄨㄟˊ'
 };
+// Traditional right-side Zhuyin: syllable stacked vertically, tone beside it.
 function storyText(text){
- return '<span class="zhuyin-text" aria-label="'+safe(text)+'">'+Array.from(text).map((ch,i)=>STORY_ZHUYIN[ch]?'<ruby aria-hidden="true">'+safe(ch)+'<rt>'+(ch==='一'&&text[i+1]==='次'?'ㄧˊ':STORY_ZHUYIN[ch])+'</rt></ruby>':'<span aria-hidden="true">'+safe(ch)+'</span>').join('')+'</span>';
+ return '<span class="zhuyin-text" aria-label="'+safe(text)+'">'+Array.from(text).map((ch,i)=>{
+  let reading=STORY_ZHUYIN[ch];
+  if(!reading)return '<span aria-hidden="true">'+safe(ch)+'</span>';
+  if(ch==='一'&&text[i+1]==='次')reading='ㄧˊ';
+  const tone=(reading.match(/[ˊˇˋ˙]/)||[''])[0];
+  const symbols=reading.replace(/[ˊˇˋ˙]/g,'');
+  return '<span class="zy-unit" aria-hidden="true"><span class="zy-character">'+safe(ch)+'</span><span class="zy-reading"><span class="zy-symbols">'+Array.from(symbols).map(s=>'<span>'+s+'</span>').join('')+'</span>'+(tone?'<span class="zy-tone'+(tone==='˙'?' zy-neutral':'')+'">'+tone+'</span>':'')+'</span></span>';
+ }).join('')+'</span>';
 }
 let activeNarration=null;
 function stopNarration(){if(activeNarration)activeNarration();}
