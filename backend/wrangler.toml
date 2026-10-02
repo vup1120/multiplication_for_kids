@@ -1,0 +1,21 @@
+name = "pig-home-stats"
+main = "src/worker.js"
+compatibility_date = "2026-09-01"
+
+[vars]
+# Pages allowed to send counts (comma separated).
+ALLOWED_ORIGINS = "https://vup1120.github.io"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "pig-home-stats"
+# Replace with the id printed by `npx wrangler d1 create pig-home-stats`.
+database_id = "00000000-0000-0000-0000-000000000000"
+
+[triggers]
+# Daily cleanup of yesterday's visitor hashes.
+crons = ["17 3 * * *"]
+
+# Secrets (set with `npx wrangler secret put <NAME>`):
+#   STATS_TOKEN  password for reading the dashboard
+#   HASH_SECRET  random string mixed into visitor hashes

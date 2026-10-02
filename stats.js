@@ -1,20 +1,16 @@
-// Anonymous usage counting with GoatCounter (no cookies, no personal data, no consent banner needed).
-// Fill in the site code from https://www.goatcounter.com (e.g. 'pig-home' for pig-home.goatcounter.com).
+// Anonymous usage counting with our own backend (backend/ in this repo, a Cloudflare Worker).
+// No cookies and nothing stored on the device; the server keeps only daily totals.
+// Set this to the deployed worker URL, e.g. 'https://pig-home-stats.<account>.workers.dev'.
 // While it is empty nothing is sent.
-const GOATCOUNTER_CODE = '';
+const STATS_ENDPOINT = '';
 
-let statsQueue = [];
 function track(name){
- if(!GOATCOUNTER_CODE)return;
+ if(!STATS_ENDPOINT || /^(localhost|127\.|\[::1\])/.test(location.hostname)) return;
  const lang = typeof language === 'string' ? language : 'zh';
- const send = () => window.goatcounter.count({path: name + '-' + lang, title: name + ' (' + lang + ')', event: true});
- try{ window.goatcounter && window.goatcounter.count ? send() : statsQueue.push(send); }catch(e){}
-}
-if(GOATCOUNTER_CODE && !/^(localhost|127\.|\[::1\])/.test(location.hostname)){
- const script = document.createElement('script');
- script.async = true;
- script.src = 'https://gc.zgo.at/count.js';
- script.dataset.goatcounter = 'https://' + GOATCOUNTER_CODE + '.goatcounter.com/count';
- script.onload = () => { statsQueue.forEach(send => { try{ send(); }catch(e){} }); statsQueue = []; };
- document.head.appendChild(script);
+ const body = JSON.stringify({n: name, l: lang});
+ try{
+  // text/plain keeps this a simple CORS request (no preflight) and sendBeacon survives page closes.
+  if(!(navigator.sendBeacon && navigator.sendBeacon(STATS_ENDPOINT + '/e', new Blob([body], {type: 'text/plain'}))))
+   fetch(STATS_ENDPOINT + '/e', {method: 'POST', body, keepalive: true, headers: {'Content-Type': 'text/plain'}}).catch(() => {});
+ }catch(e){}
 }

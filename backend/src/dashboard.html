@@ -1,0 +1,42 @@
+<!doctype html><html lang="zh-Hant"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>小豬遊戲統計</title>
+<style>
+:root{--bg:#f5efdb;--card:#fffdf4;--ink:#263e39;--muted:#6b7a72;--line:#e2dcc4;--accent:#e99c46;--accent2:#7fb35a}
+@media(prefers-color-scheme:dark){:root{--bg:#1d2421;--card:#26302c;--ink:#eef2ea;--muted:#a3b0a8;--line:#3a4641}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,"Noto Sans TC",sans-serif;padding:16px}
+main{max-width:960px;margin:0 auto}h1{font-size:24px;margin:8px 0 16px}h2{font-size:17px;margin:24px 0 10px}
+form{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}input,select,button{font:inherit;padding:8px 12px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink)}button{background:var(--accent);border:0;color:#fff;font-weight:700;cursor:pointer}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:10px}.tile{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px}.tile b{display:block;font-size:28px;font-variant-numeric:tabular-nums}.tile span{color:var(--muted);font-size:13px}
+.scroll{overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:14px}table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums;font-size:14px}th,td{padding:7px 10px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}th:first-child,td:first-child{text-align:left}th{color:var(--muted);font-weight:600}
+.bar{display:inline-block;height:9px;border-radius:5px;background:var(--accent2);vertical-align:middle;margin-right:6px}#msg,.note{color:var(--muted)}
+</style>
+<main><h1>🐷 小豬快回家！遊戲統計</h1>
+<form id="f"><input id="token" type="password" placeholder="STATS_TOKEN" autocomplete="current-password" required><select id="days"><option value="7">最近 7 天</option><option value="30" selected>最近 30 天</option><option value="90">最近 90 天</option><option value="366">最近一年</option></select><button>查看</button></form>
+<p id="msg">輸入密碼查看統計。</p><div id="out"></div></main>
+<script>
+const NAMES={visitor:'不重複訪客',pageview:'開啟次數','start-normal':'開始 10 題','finish-normal':'完成 10 題','start-challenge':'開始 60 秒','finish-challenge':'完成 60 秒'};
+const COLS=Object.keys(NAMES);
+const $=s=>document.querySelector(s);
+try{$('#token').value=localStorage.getItem('stats-token')||'';}catch(e){}
+function sum(rows,name,lang){return rows.filter(r=>r.name===name&&(!lang||r.lang===lang)).reduce((a,r)=>a+r.count,0);}
+function tiles(rows){return '<div class="tiles">'+COLS.map(n=>`<div class="tile"><span>${NAMES[n]}</span><b>${sum(rows,n)}</b><span>中文 ${sum(rows,n,'zh')} · 德文 ${sum(rows,n,'de')}</span></div>`).join('')+'</div>';}
+function render(data){
+ const days=[...new Set(data.daily.map(r=>r.day))].sort().reverse();
+ const max=Math.max(1,...days.map(d=>sum(data.daily.filter(r=>r.day===d),'visitor')));
+ const rate=(s,f)=>s?Math.round(f/s*100)+'%':'–';
+ const p=data.daily;
+ $('#msg').textContent='';
+ $('#out').innerHTML=`<h2>${data.since} ～ ${data.until}</h2>${tiles(p)}
+ <p class="note">10 題完成率 ${rate(sum(p,'start-normal'),sum(p,'finish-normal'))}　·　每位訪客平均開始 ${sum(p,'visitor')?((sum(p,'start-normal')+sum(p,'start-challenge'))/sum(p,'visitor')).toFixed(1):'–'} 局</p>
+ <h2>每日</h2><div class="scroll"><table><tr><th>日期</th>${COLS.map(n=>`<th>${NAMES[n]}</th>`).join('')}</tr>${days.map(d=>{const r=p.filter(x=>x.day===d);const v=sum(r,'visitor');return `<tr><td>${d}</td>${COLS.map(n=>`<td>${n==='visitor'?`<span class="bar" style="width:${Math.round(v/max*60)}px"></span>`:''}${sum(r,n)}</td>`).join('')}</tr>`;}).join('')||'<tr><td colspan="7">這段期間還沒有資料</td></tr>'}</table></div>
+ <h2>全部累計</h2>${tiles(data.allTime)}`;
+}
+async function load(){
+ const token=$('#token').value.trim();if(!token)return;
+ $('#msg').textContent='讀取中…';
+ const res=await fetch('stats?days='+$('#days').value,{headers:{Authorization:'Bearer '+token}}).catch(()=>null);
+ if(!res||!res.ok){$('#out').innerHTML='';$('#msg').textContent=res&&res.status===401?'密碼不正確。':'讀取失敗，請稍後再試。';return;}
+ try{localStorage.setItem('stats-token',token);}catch(e){}
+ render(await res.json());
+}
+$('#f').onsubmit=e=>{e.preventDefault();load();};$('#days').onchange=load;if($('#token').value)load();
+</script></html>
