@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+ <defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b9e8ef"/><stop offset=".62" stop-color="#e6f7ed"/><stop offset=".62" stop-color="#acd77c"/><stop offset="1" stop-color="#95bf65"/></linearGradient></defs>
+ <rect width="512" height="512" fill="url(#sky)"/>
+ <g transform="translate(256 276)">
+  <path d="M-128-96 L-150-176 L-70-136 Z" fill="#f29bb0" stroke="#d9768f" stroke-width="8" stroke-linejoin="round"/>
+  <path d="M128-96 L150-176 L70-136 Z" fill="#f29bb0" stroke="#d9768f" stroke-width="8" stroke-linejoin="round"/>
+  <ellipse rx="150" ry="128" fill="#f8b6c6" stroke="#d9768f" stroke-width="8"/>
+  <circle cx="-56" cy="-34" r="16" fill="#263e39"/><circle cx="56" cy="-34" r="16" fill="#263e39"/>
+  <circle cx="-51" cy="-40" r="5" fill="#fff"/><circle cx="61" cy="-40" r="5" fill="#fff"/>
+  <ellipse cx="-98" cy="18" rx="22" ry="13" fill="#f28ba5" opacity=".7"/><ellipse cx="98" cy="18" rx="22" ry="13" fill="#f28ba5" opacity=".7"/>
+  <ellipse cy="34" rx="62" ry="44" fill="#f29bb0" stroke="#d9768f" stroke-width="8"/>
+  <ellipse cx="-22" cy="34" rx="10" ry="15" fill="#b9566f"/><ellipse cx="22" cy="34" rx="10" ry="15" fill="#b9566f"/>
+  <path d="M-30 96 Q0 114 30 96" fill="none" stroke="#b9566f" stroke-width="8" stroke-linecap="round"/>
+ </g>
+ <text x="256" y="104" text-anchor="middle" font-family="Arial Black,Arial,sans-serif" font-weight="900" font-size="64" fill="#263e39" stroke="#fff" stroke-width="10" paint-order="stroke">9×9</text>
+</svg>
