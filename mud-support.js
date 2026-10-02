@@ -33,7 +33,7 @@
   }catch(e){}
  }
  function muddyMeltdown(next){
-  state='mud';stage.className='mud-event';
+  clearWork();state='mud';stage.className='mud-event';
   const drops=Array.from({length:34},(_,i)=>`<i style="--s:${9+i%5*7}px;--d:${(i%7)*.08}s;--x:${-260+(i*83)%520};--y:${85+(i*47)%250}"></i>`).join('');
   cinematic.className='cinematic show mud-scene';
   cinematic.innerHTML=`<div class="cinematic-copy">${sceneText(tx('小豬真的生氣了！','Das Schweinchen ist richtig sauer!'))}<span class="cinematic-sub">${sceneText(tx('牠用力跺腳，泥巴飛得到處都是！','Es stampft kräftig – der Schlamm spritzt überall hin!'))}</span></div><div class="mud-puddle"></div><div class="mud-actors"><div class="mud-girl">${girl}</div><div class="mud-pig">${pig}</div></div><div class="mud-splash">${drops}</div><i class="mud-stain s1"></i><i class="mud-stain s2"></i><i class="mud-stain s3"></i><i class="mud-stain s4"></i><div class="mud-note">${tx('糟糕！小女孩漂亮的洋裝也沾滿泥巴了。','Oh nein! Jetzt ist auch das schöne Kleid des Mädchens voller Schlamm.')}</div>`;
