@@ -135,6 +135,27 @@ header>div{display:flex;align-items:center;gap:10px}
 .cinematic-copy{line-height:1.5}
 .cinematic-sub{line-height:1.7}
 @media(max-width:700px){.cinematic-copy{font-size:clamp(19px,4.6vw,28px);padding:8px 6px;border-radius:14px}.cinematic-sub{font-size:.7em}}
+
+/* Royal completion screen */
+.finale{padding:0;background:radial-gradient(circle at 50% 25%,#7a5095,#18233f 75%);backdrop-filter:none;overflow:hidden}
+.royal-finale{position:relative;height:min(100svh,900px);max-width:100%;aspect-ratio:944/1696;margin:auto;overflow:hidden;filter:drop-shadow(0 18px 45px #10182e88)}
+.royal-finale-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;z-index:0}
+.finale .panel.royal-results{position:absolute;z-index:4;left:29%;top:35%;width:63%;height:46%;max-height:none;overflow:visible;margin:0;padding:2% 3%;transform:none;display:flex;flex-direction:column;align-items:center;justify-content:center;background:transparent;border:0;border-radius:0;box-shadow:none;animation:royal-results-in .7s .2s both;color:#49301f}
+.royal-results h1{max-width:100%;margin:0 0 4%;font-size:clamp(18px,4.5vh,38px);line-height:1.28;color:#67401f;text-align:center;text-shadow:0 2px #fff8dc}
+.royal-results .result-lines{margin:0 0 5%;font-size:clamp(12px,2.35vh,21px);line-height:1.55;color:#3f4137}
+.royal-results .primary{width:88%;margin:0 0 3%;padding:clamp(7px,1.25vh,13px);font-size:clamp(13px,2.3vh,20px);border-radius:14px;background:linear-gradient(#f8c964,#e8a73d);box-shadow:0 5px 0 #a66b26}
+.royal-results #change{margin:0!important;padding:clamp(6px,1vh,11px) clamp(10px,2vw,20px);font-size:clamp(11px,1.9vh,16px);background:#fff8e4e8;box-shadow:0 4px 0 #b8a77c}
+.finale .fireworks{z-index:2}
+.finale .firework{width:clamp(100px,24vmin,260px);mix-blend-mode:screen}
+.finale .finale-spark{z-index:3}
+@keyframes royal-results-in{from{opacity:0;transform:scale(.8) translateY(20px)}to{opacity:1;transform:none}}
+@media(max-width:700px){
+ .royal-finale{height:min(100svh,calc(100vw * 1.7966));width:min(100vw,calc(100svh * .5566))}
+ .finale .panel.royal-results{left:29%;top:35%;width:63%;height:47%;padding:2%}
+ .royal-results h1{font-size:clamp(17px,5.1vw,25px)}
+ .royal-results .result-lines{font-size:clamp(12px,3.3vw,16px)}
+ .royal-results .primary{font-size:clamp(13px,3.7vw,17px)}
+}
 </style>
 <header><strong>🐷 小豬快回家！</strong><div><a href="https://vup1120.github.io/chinese_learning_for_kids/">回中文遊戲</a>　<button id="sound" aria-label="切換音效">♪</button></div></header>
 <main id="stage"><div class="cloud"></div><div class="cloud second"></div><div class="hill"></div><div class="hill two"></div><div class="road"></div><div class="hud"><span class="badge" id="player">小豬找家</span><span class="badge" id="score">0 / 10</span><button id="pause">暫停</button></div><div class="question"><small>哪一間才是小豬的家？</small><div class="equation" id="equation">7 × 3 = ?</div><div class="timer"><i id="bar"></i></div><b id="seconds">5.0 秒</b></div><div class="scene"><div id="status" role="status" aria-live="polite"></div><div class="houses" id="houses"></div><div class="party" id="party"></div><div class="flock" id="flock"></div><div class="boom">砰！</div><div class="tears" id="tears"></div><div class="flood"></div><div class="caption" id="caption">點選答案房子，快帶小豬回家！</div>
@@ -174,6 +195,26 @@ function choose(value,door,button){if(state!=='playing')return;if(performance.no
 function fail(kind){if(!['playing','approach'].includes(state))return;lock();state=kind;game.misses++;game.streak=0;$('.pig-wrap').classList.add('crying');if(kind==='wrong'){stage.className='chase';showCinema('chase-scene','哇！母雞追來啦！','快跑！');sound('chase');storyThen('chase',2800,()=>angryPig(round));}else{game.timeouts++;stage.className='burst';showCinema('inflate-scene','砰！時間到！','小豬生氣啦！');$('#tears').innerHTML=Array.from({length:65},(_,i)=>`<i class="drop" style="left:${i*1.6}%;--size:${14+i%6*8}px;--delay:${-(i%13)*.09}s;--top:${i%10*10}%"></i>`).join('');sound('burst');storyThen('timeout',2200,()=>angryPig(round));}}
 function pause(){if(state!=='playing')return;remaining=Math.max(0,deadline-performance.now());clearInterval(timer);state='paused';stage.classList.add('paused');document.querySelectorAll('.house').forEach(b=>b.disabled=true);overlay.classList.remove('hidden');overlay.innerHTML='<div class="panel"><h1>小豬休息中 🐷</h1><p>倒數已暫停。</p><button class="primary" id="resume">繼續找家</button><button id="change" style="margin-top:16px">換名字或乘法表</button></div>';$('#resume').onclick=()=>{overlay.classList.add('hidden');state='playing';stage.classList.remove('paused');deadline=performance.now()+remaining;document.querySelectorAll('.house').forEach(b=>b.disabled=false);tick();timer=setInterval(tick,40);};$('#change').onclick=setup;}
 
+function fireworkBurstSound(delay=0){
+ if(!prefs.sound)return;
+ later(()=>{
+  try{
+   audioCtx=audioCtx||new(window.AudioContext||window.webkitAudioContext)();audioCtx.resume();
+   const now=audioCtx.currentTime;
+   const noise=audioCtx.createBuffer(1,audioCtx.sampleRate*.75,audioCtx.sampleRate);
+   const data=noise.getChannelData(0);for(let i=0;i<data.length;i++)data[i]=(Math.random()*2-1)*Math.pow(1-i/data.length,2);
+   const src=audioCtx.createBufferSource(),filter=audioCtx.createBiquadFilter(),gain=audioCtx.createGain();
+   src.buffer=noise;filter.type='bandpass';filter.frequency.value=900+Math.random()*900;
+   gain.gain.setValueAtTime(.0001,now);gain.gain.exponentialRampToValueAtTime(.14,now+.015);gain.gain.exponentialRampToValueAtTime(.0001,now+.72);
+   src.connect(filter);filter.connect(gain);gain.connect(audioCtx.destination);src.start(now);
+   const boom=audioCtx.createOscillator(),boomGain=audioCtx.createGain();
+   boom.type='sine';boom.frequency.setValueAtTime(115+Math.random()*35,now);boom.frequency.exponentialRampToValueAtTime(45,now+.5);
+   boomGain.gain.setValueAtTime(.09,now);boomGain.gain.exponentialRampToValueAtTime(.0001,now+.65);
+   boom.connect(boomGain);boomGain.connect(audioCtx.destination);boom.start(now);boom.stop(now+.7);
+  }catch(e){}
+ },delay);
+}
+function startFireworkShow(){[120,650,1180,1900,2650,3500,4550,5700,7000].forEach(fireworkBurstSound);}
 function celebrateFinale(){
  overlay.classList.add('finale');
  const colors=['#ffe6a0','#ffbdd1','#bceaff','#e0c6ff'];
@@ -186,9 +227,9 @@ function celebrateFinale(){
  }).join('');
  const confetti=Array.from({length:30},(_,i)=>'<span class="finale-spark" style="--x:'+(i*37%100)+'%;--y:'+(i*19%100)+'%;--color:'+colors[i%4]+';--delay:'+(-i*.23)+'s">✦</span>').join('');
  overlay.insertAdjacentHTML('afterbegin','<div class="fireworks" aria-hidden="true">'+bursts+confetti+'</div>');
- sound('reward10');
+ sound('reward10');startFireworkShow();
 }
 
-function finish(){clearWork();state='finished';$('#score').textContent=`${game.index} / ${game.qs.length}`;overlay.classList.remove('hidden');overlay.innerHTML=`<div class="panel"><div id="ready-pig">${pig}</div><h1>${safe(prefs.name)}，${storyText('全部到家！')}</h1><p>成功帶小豬回家 <b>${game.qs.length}</b> 次！<br>被母雞追了 ${game.misses-game.timeouts} 次<br>超過時間 ${game.timeouts} 次</p><button class="primary" id="again">再救一次小豬！</button><button id="change" style="margin-top:16px">換名字或乘法表</button></div>`;$('#again').onclick=()=>{game={qs:buildQuestions(prefs.tables),index:0,misses:0,timeouts:0,streak:0,princess:false};countIn();};$('#change').onclick=setup;celebrateFinale();narrate('finish');}
+function finish(){clearWork();state='finished';$('#score').textContent=`${game.index} / ${game.qs.length}`;overlay.classList.remove('hidden');overlay.innerHTML=`<div class="royal-finale"><img class="royal-finale-bg" src="assets/finale-palace.svg" alt="王子、小豬與皇家捲軸"><div class="panel royal-results"><h1>${safe(prefs.name)}，${storyText('全部到家！')}</h1><p class="result-lines">成功帶小豬回家 <b>${game.qs.length}</b> 次！<br>被母雞追了 ${game.misses-game.timeouts} 次<br>超過時間 ${game.timeouts} 次</p><button class="primary" id="again">再救一次小豬！</button><button id="change">換名字或乘法表</button></div></div>`;$('#again').onclick=()=>{game={qs:buildQuestions(prefs.tables),index:0,misses:0,timeouts:0,streak:0,princess:false};countIn();};$('#change').onclick=setup;celebrateFinale();narrate('finish');}
 $('#pause').onclick=pause;$('#sound').onclick=()=>{prefs.sound=!prefs.sound;if(!prefs.sound)stopNarration();$('#sound').textContent=prefs.sound?'♪':'靜音';$('#sound').setAttribute('aria-pressed',String(prefs.sound));};$('#sound').textContent=prefs.sound?'♪':'靜音';document.addEventListener('visibilitychange',()=>{if(document.hidden)pause();});document.addEventListener('keydown',e=>{if(e.key==='Escape')pause();if(state==='playing'&&['1','2','3'].includes(e.key)){const b=document.querySelectorAll('.house')[+e.key-1];b.click();}});setup();
 </script></html>
