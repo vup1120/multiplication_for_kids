@@ -6,7 +6,7 @@ const STORY_VOICES = {
  angry: {src:null, text:'哼！你要認真一點啦！看清楚，再試一次！'},
  chase: {src:null, text:'哇！母雞追來啦！快跑！'},
  timeout: {src:null, text:'砰！時間到！小豬生氣啦！'},
- finish: {src:null, text:'耶！全部到家！謝謝你帶我回家！'}
+ finish: {src:null, text:'耶！任務成功！謝謝你帶我回家！'}
 };
 const STORY_ZHUYIN = {
  公:'ㄍㄨㄥ',主:'ㄓㄨˇ',魔:'ㄇㄛˊ',法:'ㄈㄚˇ',變:'ㄅㄧㄢˋ',身:'ㄕㄣ',
@@ -18,7 +18,7 @@ const STORY_ZHUYIN = {
  哇:'ㄨㄚ',母:'ㄇㄨˇ',雞:'ㄐㄧ',追:'ㄓㄨㄟ',快:'ㄎㄨㄞˋ',跑:'ㄆㄠˇ',
  砰:'ㄆㄥ',時:'ㄕˊ',間:'ㄐㄧㄢ',到:'ㄉㄠˋ',生:'ㄕㄥ',氣:'ㄑㄧˋ',
  答:'ㄉㄚˊ',對:'ㄉㄨㄟˋ',題:'ㄊㄧˊ',新:'ㄒㄧㄣ',紀:'ㄐㄧˋ',錄:'ㄌㄨˋ',最:'ㄗㄨㄟˋ',高:'ㄍㄠ',挑:'ㄊㄧㄠˇ',戰:'ㄓㄢˋ',
- 耶:'ㄧㄝ',全:'ㄑㄩㄢˊ',部:'ㄅㄨˋ',家:'ㄐㄧㄚ',謝:'ㄒㄧㄝˋ',帶:'ㄉㄞˋ',我:'ㄨㄛˇ',回:'ㄏㄨㄟˊ'
+ 任:'ㄖㄣˋ',務:'ㄨˋ',成:'ㄔㄥˊ',功:'ㄍㄨㄥ',耶:'ㄧㄝ',全:'ㄑㄩㄢˊ',部:'ㄅㄨˋ',家:'ㄐㄧㄚ',謝:'ㄒㄧㄝˋ',帶:'ㄉㄞˋ',我:'ㄨㄛˇ',回:'ㄏㄨㄟˊ'
 };
 // Traditional right-side Zhuyin: syllable stacked vertically, tone beside it.
 function storyText(text){
@@ -36,7 +36,7 @@ function stopNarration(){if(activeNarration)activeNarration();}
 function narrate(key){
  stopNarration();
  const src=STORY_VOICES[key]?.src;
- if(!prefs.sound||!src)return Promise.resolve();
+ if(!prefs.sound||!src||(typeof language!=='undefined'&&language!=='zh'))return Promise.resolve();
  return new Promise(resolve=>{
   const clip=new Audio(src);
   let watchdog;
