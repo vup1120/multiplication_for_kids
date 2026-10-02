@@ -353,6 +353,11 @@ if('serviceWorker' in navigator){
   cinematic.innerHTML=`<div class="cinematic-copy">${sceneText(tx('小豬真的生氣了！','Das Schweinchen ist richtig sauer!'))}<span class="cinematic-sub">${sceneText(tx('牠用力跺腳，泥巴飛得到處都是！','Es stampft kräftig – der Schlamm spritzt überall hin!'))}</span></div><div class="mud-puddle"></div><div class="mud-actors"><div class="mud-girl">${girl}</div><div class="mud-pig">${pig}</div></div><div class="mud-splash">${drops}</div><i class="mud-stain s1"></i><i class="mud-stain s2"></i><i class="mud-stain s3"></i><i class="mud-stain s4"></i><div class="mud-note">${tx('糟糕！小女孩漂亮的洋裝也沾滿泥巴了。','Oh nein! Jetzt ist auch das schöne Kleid des Mädchens voller Schlamm.')}</div>`;
   mudSound();later(()=>{game.failChain=0;hideCinema();next();},4200);
  }
+ const originalAngryPig=angryPig;
+ angryPig=function(next){
+  if(state==='mud')return;
+  return originalAngryPig(next);
+ };
  const originalChoose=choose;
  choose=function(value,door,button){
   if(state==='playing'&&game&&game.mode!=='timed'){
