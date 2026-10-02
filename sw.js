@@ -1,10 +1,11 @@
 // Offline support: precache the game shell, then serve from cache and refresh in the background.
  // Bump VERSION whenever the precache list changes.
-const VERSION = 'pig-home-v4';
+const VERSION = 'pig-home-v5';
 const PRECACHE = [
  './',
  './index.html',
  './story-support.js',
+ './stats.js',
  './manifest.json',
  './assets/finale-palace.svg',
  './icons/icon.svg',
