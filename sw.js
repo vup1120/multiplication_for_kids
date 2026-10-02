@@ -1,6 +1,6 @@
 // Fetch the game shell from the network first, with an offline cache fallback.
  // Bump VERSION whenever the precache list changes.
-const VERSION = 'pig-home-v7-fresh-shell';
+const VERSION = 'pig-home-v8-mud-scene';
 const PRECACHE = [
  './',
  './index.html',
