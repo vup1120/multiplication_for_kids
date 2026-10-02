@@ -34,16 +34,5 @@
   dialog.querySelector('.review-return').onclick=()=>dialog.close();
   dialog.showModal();dialog.scrollTop=0;
  }
- function addReviewButton(){
-  const start=document.querySelector('#start');
-  if(!start||document.querySelector('#review-open'))return;
-  const button=document.createElement('button');
-  button.id='review-open';button.type='button';button.className='review-open';
-  button.textContent=language==='de'?'📖 Einmaleins üben':'📖 複習九九乘法表';
-  button.setAttribute('aria-haspopup','dialog');button.onclick=showReview;
-  start.before(button);
- }
- const originalSetup=setup;
- setup=function(){originalSetup();addReviewButton();};
- addReviewButton();
+ window.openMultiplicationReview=showReview;
 })();
