@@ -1,6 +1,6 @@
 // Offline support: precache the game shell, then serve from cache and refresh in the background.
-// Bump VERSION whenever the precache list changes.
-const VERSION = 'pig-home-v1';
+ // Bump VERSION whenever the precache list changes.
+const VERSION = 'pig-home-v2';
 const PRECACHE = [
  './',
  './index.html',
