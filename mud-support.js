@@ -33,7 +33,7 @@
   }catch(e){}
  }
  function muddyMeltdown(next){
-  clearWork();state='mud';stage.className='mud-event';
+  clearWork();state='mud';game.muddy=true;stage.className='mud-event';
   const drops=Array.from({length:34},(_,i)=>`<i style="--s:${9+i%5*7}px;--d:${(i%7)*.08}s;--x:${-260+(i*83)%520};--y:${85+(i*47)%250}"></i>`).join('');
   cinematic.className='cinematic show mud-scene';
   cinematic.innerHTML=`<div class="cinematic-copy">${sceneText(tx('小豬真的生氣了！','Das Schweinchen ist richtig sauer!'))}<span class="cinematic-sub">${sceneText(tx('牠用力跺腳，泥巴飛得到處都是！','Es stampft kräftig – der Schlamm spritzt überall hin!'))}</span></div><div class="mud-puddle"></div><div class="mud-actors"><div class="mud-girl">${girl}</div><div class="mud-pig">${pig}</div></div><div class="mud-splash">${drops}</div><i class="mud-stain s1"></i><i class="mud-stain s2"></i><i class="mud-stain s3"></i><i class="mud-stain s4"></i><div class="mud-note">${tx('糟糕！小女孩漂亮的洋裝也沾滿泥巴了。','Oh nein! Jetzt ist auch das schöne Kleid des Mädchens voller Schlamm.')}</div>`;
@@ -43,6 +43,38 @@
  angryPig=function(next){
   if(state==='mud')return;
   return originalAngryPig(next);
+ };
+ const originalActors=actors;
+ actors=function(){
+  originalActors();
+  if(!game)return;
+  const svg=document.querySelector('#party .girl');
+  if(!svg)return;
+  if(game.newDress){
+   svg.setAttribute('aria-label',tx('穿著小豬送的新洋裝的小女孩','Mädchen im neuen Kleid vom Schweinchen'));
+   const skirt=svg.querySelector('path[fill="#9dc9e3"]');if(skirt)skirt.setAttribute('fill','#e8acd2');
+   const sleeves=svg.querySelector('path[stroke="#b4d8ed"]');if(sleeves)sleeves.setAttribute('stroke','#efb3d1');
+   const trim=svg.querySelector('path[stroke="#e9f6fa"]');if(trim)trim.setAttribute('stroke','#fff1b8');
+   const decorations=document.createElementNS('http://www.w3.org/2000/svg','g');
+   decorations.setAttribute('class','new-dress-decorations');
+   decorations.setAttribute('aria-hidden','true');
+   decorations.innerHTML=`<g fill="#f5cf67" stroke="#9b6637" stroke-width="1.2"><path d="M54 150Q80 165 107 150" fill="none" stroke="#f5cf67" stroke-width="4"/><circle cx="80" cy="145" r="6" fill="#8fcce8"/><circle cx="59" cy="174" r="4"/><circle cx="101" cy="174" r="4"/><path d="M47 195Q80 213 114 195" fill="none" stroke="#f5cf67" stroke-width="4"/></g>`;
+   svg.appendChild(decorations);return;
+  }
+  if(!game.muddy)return;
+  svg.setAttribute('aria-label',tx('衣服沾滿泥巴的小女孩','Mädchen mit einem schlammverschmierten Kleid'));
+  const marks=document.createElementNS('http://www.w3.org/2000/svg','g');
+  marks.setAttribute('class','persistent-mud-marks');
+  marks.setAttribute('aria-hidden','true');
+  marks.innerHTML=`<g fill="#694126" stroke="#442816" stroke-width="1.5" opacity=".92"><ellipse cx="52" cy="149" rx="11" ry="7" transform="rotate(24 52 149)"/><ellipse cx="94" cy="183" rx="15" ry="9" transform="rotate(-18 94 183)"/><ellipse cx="60" cy="201" rx="8" ry="5" transform="rotate(12 60 201)"/><ellipse cx="119" cy="151" rx="7" ry="4" transform="rotate(-24 119 151)"/><ellipse cx="40" cy="162" rx="5" ry="3"/><ellipse cx="55" cy="224" rx="7" ry="4"/><ellipse cx="102" cy="229" rx="9" ry="4"/><circle cx="77" cy="160" r="3"/><circle cx="111" cy="193" r="3.5"/><circle cx="68" cy="214" r="2.5"/></g>`;
+  svg.appendChild(marks);
+ };
+ const originalRewardScene=rewardScene;
+ rewardScene=function(level,next){
+  if(level!==5||!game||!game.muddy)return originalRewardScene(level,next);
+  showCinema('reward5',tx('小豬送妳一件新洋裝！','Das Schweinchen schenkt dir ein neues Kleid!'),tx('連續答對五題，換上乾淨漂亮的新洋裝！','Fünf richtige Antworten hintereinander – zieh dein schönes neues Kleid an!'));
+  game.muddy=false;game.newDress=true;sound('reward5');
+  later(()=>{hideCinema();next();},4300);
  };
  const originalChoose=choose;
  choose=function(value,door,button){
