@@ -1,6 +1,6 @@
 // Fetch the game shell from the network first, with an offline cache fallback.
  // Bump VERSION whenever the precache list changes.
-const VERSION = 'pig-home-v10-new-dress';
+const VERSION = 'pig-home-v11-slim-angry-pig';
 const PRECACHE = [
  './',
  './index.html',

@@ -319,7 +319,7 @@ if('serviceWorker' in navigator){
  .cinematic.mud-scene{background:linear-gradient(#8ed2e4 0 53%,#83b55d 53% 69%,#9a6a3e 69%);overflow:hidden}
  .cinematic.mud-scene:before{content:'';position:absolute;left:-8%;right:-8%;bottom:-13%;height:44%;border-radius:50% 48% 0 0;background:radial-gradient(ellipse at 20% 25%,#c89a62 0 4%,transparent 4.5%),radial-gradient(ellipse at 65% 32%,#674124 0 6%,transparent 6.5%),radial-gradient(ellipse at 46% 70%,#80512d 0 7%,transparent 7.5%),#a87543;box-shadow:inset 0 18px 25px #5c3a2055}
  .mud-actors{position:absolute;inset:0;z-index:2}.mud-girl{position:absolute;left:30%;bottom:10%;width:clamp(105px,18vw,235px);height:auto;filter:drop-shadow(0 8px 5px #2c261d44)}
- .mud-girl .girl{position:static;width:100%;height:auto}.mud-pig{position:absolute;right:27%;bottom:10%;width:clamp(115px,20vw,250px);animation:mud-stomp .32s ease-in-out 7 alternate;transform-origin:50% 92%}.mud-pig .pig{width:100%;height:auto}.mud-pig .calm-eye{display:none}.mud-pig .cry-eye{display:block}
+ .mud-girl .girl{position:static;width:100%;height:auto}.mud-pig{position:absolute;right:30%;bottom:11%;width:clamp(88px,14vw,175px);animation:mud-stomp .32s ease-in-out 7 alternate;transform-origin:50% 92%}.mud-pig .pig{width:100%;height:auto}.mud-pig .calm-eye,.mud-pig .cry-eye{display:none}.mud-pig .mud-angry-face{display:block}
  .mud-puddle{position:absolute;right:22%;bottom:7%;width:30%;height:12%;border-radius:50%;background:#654025;box-shadow:inset 0 9px 12px #3e2818aa;animation:puddle-grow .8s .3s both}
  .mud-splash{position:absolute;inset:0;z-index:4;pointer-events:none}.mud-splash i{position:absolute;left:62%;top:70%;width:var(--s);height:calc(var(--s)*.72);border-radius:50%;background:#694326;border:2px solid #9b6b3e;animation:mud-fly 1.05s var(--d) cubic-bezier(.18,.7,.35,1) both;transform:translate(-50%,-50%)}
  .mud-stain{position:absolute;z-index:5;border-radius:47% 53% 56% 44%;background:#674126dd;border:2px solid #3e2818aa;opacity:0;animation:stain-appear .2s var(--d) forwards}.mud-stain.s1{left:35%;bottom:28%;width:6%;height:8%;--d:.8s}.mud-stain.s2{left:40%;bottom:19%;width:4%;height:7%;--d:1.15s}.mud-stain.s3{left:32%;bottom:41%;width:3.5%;height:5%;--d:1.45s}.mud-stain.s4{left:45%;bottom:32%;width:2.8%;height:4%;--d:1.7s}
@@ -328,7 +328,7 @@ if('serviceWorker' in navigator){
  @keyframes puddle-grow{from{transform:scale(.4);opacity:.2}to{transform:scale(1);opacity:1}}
  @keyframes mud-fly{0%{transform:translate(-50%,-50%) scale(.4);opacity:0}12%{opacity:1}60%{transform:translate(calc(var(--x)*1px),calc(var(--y)*-1px)) rotate(220deg) scale(1)}100%{transform:translate(calc(var(--x)*1.35px),calc(var(--y)*-.35px)) rotate(380deg) scale(.75);opacity:.15}}
  @keyframes stain-appear{to{opacity:1;transform:rotate(18deg)}}
- @media(max-width:600px){.mud-girl{left:22%;bottom:9%}.mud-pig{right:18%;bottom:9%}.mud-puddle{right:12%;width:40%}.mud-note{font-size:14px;padding:6px 8px}.mud-scene .cinematic-copy{font-size:clamp(18px,5vw,26px)}}
+ @media(max-width:600px){.mud-girl{left:22%;bottom:9%}.mud-pig{right:23%;bottom:10%;width:clamp(92px,28vw,125px)}.mud-puddle{right:14%;width:34%}.mud-note{font-size:14px;padding:6px 8px}.mud-scene .cinematic-copy{font-size:clamp(18px,5vw,26px)}}
  @media(prefers-reduced-motion:reduce){.mud-pig,.mud-splash i,.mud-puddle{animation:none}.mud-stain{opacity:1;animation:none}}
  `;
  document.head.append(style);
@@ -346,11 +346,21 @@ if('serviceWorker' in navigator){
    });
   }catch(e){}
  }
+ function angryMudPig(){
+  return pig
+   .replace('aria-label="可愛的小豬"',`aria-label="${tx('生氣跺腳的小豬','Wütend stampfendes Schweinchen')}"`)
+   .replace('M126 78q27-23 17-29q-15-7-7 10','M115 76q23-19 15-25q-13-6-7 9')
+   .replace('M41 98v20M103 98v20','M52 94v25M98 94v25')
+   .replace('stroke="#b96c85" stroke-width="12"','stroke="#b96c85" stroke-width="7"')
+   .replace('cx="75" cy="73" rx="56" ry="43"','cx="75" cy="73" rx="46" ry="35"')
+   .replace('cx="72" cy="84" rx="25" ry="17"','cx="72" cy="84" rx="21" ry="14"')
+   .replace('</svg>','<g class="mud-angry-face" fill="none" stroke="#493844" stroke-linecap="round"><path d="M38 53l20 8M106 53L86 61" stroke-width="5"/><ellipse cx="49" cy="67" rx="4" ry="6" fill="#493844" stroke="none"/><ellipse cx="96" cy="67" rx="4" ry="6" fill="#493844" stroke="none"/><path d="M64 108Q73 98 84 108" stroke-width="4"/></g></svg>');
+ }
  function muddyMeltdown(next){
   clearWork();state='mud';game.muddy=true;stage.className='mud-event';
   const drops=Array.from({length:34},(_,i)=>`<i style="--s:${9+i%5*7}px;--d:${(i%7)*.08}s;--x:${-260+(i*83)%520};--y:${85+(i*47)%250}"></i>`).join('');
   cinematic.className='cinematic show mud-scene';
-  cinematic.innerHTML=`<div class="cinematic-copy">${sceneText(tx('小豬真的生氣了！','Das Schweinchen ist richtig sauer!'))}<span class="cinematic-sub">${sceneText(tx('牠用力跺腳，泥巴飛得到處都是！','Es stampft kräftig – der Schlamm spritzt überall hin!'))}</span></div><div class="mud-puddle"></div><div class="mud-actors"><div class="mud-girl">${girl}</div><div class="mud-pig">${pig}</div></div><div class="mud-splash">${drops}</div><i class="mud-stain s1"></i><i class="mud-stain s2"></i><i class="mud-stain s3"></i><i class="mud-stain s4"></i><div class="mud-note">${tx('糟糕！小女孩漂亮的洋裝也沾滿泥巴了。','Oh nein! Jetzt ist auch das schöne Kleid des Mädchens voller Schlamm.')}</div>`;
+  cinematic.innerHTML=`<div class="cinematic-copy">${sceneText(tx('小豬真的生氣了！','Das Schweinchen ist richtig sauer!'))}<span class="cinematic-sub">${sceneText(tx('牠用力跺腳，泥巴飛得到處都是！','Es stampft kräftig – der Schlamm spritzt überall hin!'))}</span></div><div class="mud-puddle"></div><div class="mud-actors"><div class="mud-girl">${girl}</div><div class="mud-pig">${angryMudPig()}</div></div><div class="mud-splash">${drops}</div><i class="mud-stain s1"></i><i class="mud-stain s2"></i><i class="mud-stain s3"></i><i class="mud-stain s4"></i><div class="mud-note">${tx('糟糕！小女孩漂亮的洋裝也沾滿泥巴了。','Oh nein! Jetzt ist auch das schöne Kleid des Mädchens voller Schlamm.')}</div>`;
   mudSound();later(()=>{game.failChain=0;hideCinema();next();},4200);
  }
  const originalAngryPig=angryPig;
